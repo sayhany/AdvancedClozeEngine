@@ -26,36 +26,36 @@ class AdvancedClozeEngine:
         self.user_feedback = []
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(self.device)
-    
-    # Enhanced difficulty configuration
-    self.difficulty_config = {
-        'easy': {
-            'num_masks': 1,
-            'threshold_percentile': 95,
-            'allow_phrases': False,
-            'allow_overlap': False
-        },
-        'medium': {
-            'num_masks': 2,
-            'threshold_percentile': 85,
-            'allow_phrases': True,
-            'allow_overlap': False
-        },
-        'hard': {
-            'num_masks': 3,
-            'threshold_percentile': 75,
-            'allow_phrases': True,
-            'allow_overlap': True
+        
+        # Enhanced difficulty configuration
+        self.difficulty_config = {
+            'easy': {
+                'num_masks': 1,
+                'threshold_percentile': 95,
+                'allow_phrases': False,
+                'allow_overlap': False
+            },
+            'medium': {
+                'num_masks': 2,
+                'threshold_percentile': 85,
+                'allow_phrases': True,
+                'allow_overlap': False
+            },
+            'hard': {
+                'num_masks': 3,
+                'threshold_percentile': 75,
+                'allow_phrases': True,
+                'allow_overlap': True
+            }
         }
-    }
+        
+        # Feedback adjustment parameters
+        self.feedback_adjustments = {
+            'too_easy': {'threshold_delta': 5, 'boost_delta': 0.1},
+            'too_hard': {'threshold_delta': -5, 'boost_delta': -0.1},
+            'perfect': {'threshold_delta': 0, 'boost_delta': 0}
+        }
     
-    # Feedback adjustment parameters
-    self.feedback_adjustments = {
-        'too_easy': {'threshold_delta': 5, 'boost_delta': 0.1},
-        'too_hard': {'threshold_delta': -5, 'boost_delta': -0.1},
-        'perfect': {'threshold_delta': 0, 'boost_delta': 0}
-    }
-
     def analyze_attention(
         self, text: str
     ) -> Tuple[torch.Tensor, List[str], torch.Tensor]:
@@ -266,7 +266,7 @@ class AdvancedClozeEngine:
                         "type": "phrase",
                         "domain_bonus": domain_bonus,
                         "cross_sent_bonus": cross_bonus,
-                        "attention_pattern": phrase_attention.item()
+                        "attention_pattern": phrase_attention.item(),  # Added comma here
                         "hint": self.generate_hint(candidate, metrics)
                     })
         

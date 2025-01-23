@@ -4,7 +4,7 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 from typing import Dict, List, Optional
-from .engine import AdvancedClozeEngine
+from engine import AdvancedClozeEngine  # Changed to import from the same directory
 import json
 import base64
 from datetime import datetime
@@ -233,9 +233,9 @@ def main():
     if 'engine' not in st.session_state:
         st.session_state.engine = initialize_engine()
     
-    # Input validation
-    st.markdown("### Input Text")
-    text = st.text_area("Enter your text here", height=150)
+    # Remove this duplicate text input section
+    # st.markdown("### Input Text")
+    # text = st.text_area("Enter your text here", height=150)
     if text and len(text.split()) < 3:
         st.warning("⚠️ Text is too short for effective cloze generation")
     
