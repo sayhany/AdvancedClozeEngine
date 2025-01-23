@@ -124,11 +124,13 @@ class AdvancedClozeEngine:
         strategy: str = "cross_sep",
         difficulty: str = "medium"
     ) -> List[Dict]:
-        importance, metrics = self.compute_token_importance(attention, tokens, strategy)
+        # Fix: compute_token_importance only takes attention and optional layer_weights
+        importance = self.compute_token_importance(attention)
+        metrics = {}  # Initialize empty metrics dictionary
+        scores = importance.cpu().numpy()  # Convert to numpy array for easier handling
         
         # Get basic candidates
         candidates = []
-        scores = importance.cpu()
         
         # Add single-token candidates
         for idx, (token, score) in enumerate(zip(tokens, scores)):
@@ -143,7 +145,7 @@ class AdvancedClozeEngine:
         
         # Add phrase candidates for medium/hard difficulty
         if difficulty in ["medium", "hard"]:
-            phrases = self.detect_phrases(attention, tokens, scores)
+            phrases = self.detect_phrases(attention, tokens, torch.tensor(scores, device=self.device), metrics)
             candidates.extend(phrases)
         
         # Filter by POS tags
@@ -213,26 +215,27 @@ class AdvancedClozeEngine:
         scores: torch.Tensor,
         metrics: Dict
     ) -> List[Dict]:
-        """Detect high-attention phrases with enhanced scoring."""
         phrases = []
         seq_len = len(tokens)
-        mean_attention = attention.mean(dim=(0, 2))[0]
+        # Convert tensors to numpy arrays first
+        mean_attention = attention.mean(dim=(0, 2))[0].detach().cpu().numpy()
+        scores = scores.detach().cpu().numpy()
         
-        # Pre-compute domain and cross-sentence factors for efficiency
-        domain_factors = torch.ones(seq_len, device=self.device)
+        # Pre-compute factors as numpy arrays
+        domain_factors = np.ones(seq_len)
         if self.domain_tokens:
             for idx, token in enumerate(tokens):
                 if token in self.domain_tokens:
                     domain_factors[idx] = self.domain_boost_factor
         
-        cross_sent_factors = metrics.get('cross_attention', 
-                                       torch.ones(seq_len, device=self.device))
+        cross_sent_factors = np.ones(seq_len)
+        if 'cross_attention' in metrics:
+            cross_sent_factors = metrics['cross_attention'].detach().cpu().numpy()
         
         for start in range(seq_len - 1):
             if tokens[start].startswith("["):
                 continue
             
-            # Track overlapping phrases to avoid duplicates
             covered_spans = set()
             
             for length in range(2, min(self.phrase_config["max_phrase_len"] + 1,
@@ -240,34 +243,30 @@ class AdvancedClozeEngine:
                 end = start + length
                 span = (start, end)
                 
-                # Skip if span overlaps with stronger phrase
                 if any(s[0] <= start <= s[1] or s[0] <= end <= s[1] 
                       for s in covered_spans):
                     continue
                 
-                # Compute phrase scores
-                phrase_attention = mean_attention[start:end, start:end].mean()
-                base_score = float(scores[start:end].mean())
+                # Use numpy operations
+                phrase_attention = float(np.mean(mean_attention[start:end, start:end]))
+                base_score = float(np.mean(scores[start:end]))
+                domain_bonus = float(np.mean(domain_factors[start:end]))
+                cross_bonus = 1.0 + float(np.mean(cross_sent_factors[start:end]))
                 
-                # Calculate bonuses
-                domain_bonus = float(domain_factors[start:end].mean())
-                cross_bonus = 1.0 + float(cross_sent_factors[start:end].mean())
-                
-                # Combined score with diminishing returns
                 final_score = base_score * (1.0 + np.log1p(domain_bonus * cross_bonus))
                 
                 if final_score > self.phrase_config["phrase_threshold"]:
                     covered_spans.add(span)
                     phrases.append({
-                        "start": start,
-                        "end": end,
+                        "start": int(start),  # Ensure integer indices
+                        "end": int(end),      # Ensure integer indices
                         "tokens": tokens[start:end],
-                        "score": final_score,
+                        "score": float(final_score),
                         "type": "phrase",
-                        "domain_bonus": domain_bonus,
-                        "cross_sent_bonus": cross_bonus,
-                        "attention_pattern": phrase_attention.item(),  # Added comma here
-                        "hint": self.generate_hint(candidate, metrics)
+                        "domain_bonus": float(domain_bonus),
+                        "cross_sent_bonus": float(cross_bonus),
+                        "attention_pattern": phrase_attention,
+                        "hint": self.generate_hint({"type": "phrase", "score": final_score}, metrics)
                     })
         
         return phrases
