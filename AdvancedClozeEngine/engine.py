@@ -91,15 +91,6 @@ class AdvancedClozeEngine:
     def compute_token_importance(
         self, attention: torch.Tensor, layer_weights: Optional[List[float]] = None
     ) -> torch.Tensor:
-        """Compute importance scores for each token based on attention patterns.
-
-        Args:
-            attention: Attention tensor from model
-            layer_weights: Optional weights for each layer
-
-        Returns:
-            Tensor of importance scores for each token
-        """
         if layer_weights is None:
             layer_weights = self.layer_weights
 
@@ -110,9 +101,10 @@ class AdvancedClozeEngine:
         # Compute weighted attention
         weighted_attention = attention * layer_weights
 
-        # Average across layers and heads
+        # Average across layers and heads and remove batch dimension
         token_importance = weighted_attention.mean(dim=(0, 2))  # Average across layers and heads
         token_importance = token_importance.mean(dim=1)  # Average incoming attention
+        token_importance = token_importance.squeeze(0)  # Remove batch dimension
 
         return token_importance
 
