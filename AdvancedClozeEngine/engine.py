@@ -1,4 +1,4 @@
-"""Core engine for the AttentionFlash system."""
+"""Core engine for the AdvancedClozeEngine system."""
 
 from typing import Dict, List, Tuple, Optional, Set
 import torch
@@ -101,10 +101,10 @@ class AdvancedClozeEngine:
         # Compute weighted attention
         weighted_attention = attention * layer_weights
 
-        # Average across layers and heads and remove batch dimension
-        token_importance = weighted_attention.mean(dim=(0, 2))  # Average across layers and heads
-        token_importance = token_importance.mean(dim=1)  # Average incoming attention
-        token_importance = token_importance.squeeze(0)  # Remove batch dimension
+        # Average across layers and heads, then across attention dimension
+        token_importance = weighted_attention.mean(dim=(0, 2))  # [batch, seq_len, seq_len]
+        token_importance = token_importance.squeeze(0)          # [seq_len, seq_len]
+        token_importance = token_importance.mean(dim=0)         # [seq_len]
 
         return token_importance
 

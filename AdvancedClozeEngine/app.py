@@ -1,4 +1,4 @@
-"""Streamlit-based web interface for AttentionFlash."""
+"""Streamlit-based web interface for AdvancedClozeEngine."""
 
 import streamlit as st
 import numpy as np
@@ -187,7 +187,7 @@ def show_help_sidebar():
         with st.expander("What is a Cloze Card?"):
             st.markdown("""
                 A cloze card is a learning tool where key words or phrases are removed from text.
-                AttentionFlash uses BERT's attention patterns to intelligently choose what to mask.
+                AdvancedClozeEngine uses BERT's attention patterns to intelligently choose what to mask.
             """)
         
         with st.expander("Difficulty Levels"):
@@ -205,7 +205,7 @@ def show_help_sidebar():
 
 def main():
     """Main Streamlit application."""
-    st.title("AttentionFlash")
+    st.title("AdvancedClozeEngine")
     show_help_sidebar()
     
     # Example text selector

@@ -1,139 +1,125 @@
-# AttentionFlash
+# AdvancedClozeEngine
 
-AttentionFlash is a next-generation cloze flashcard system that leverages BERT's attention mechanisms to intelligently generate study materials. The system analyzes text using transformer attention patterns to identify key concepts and create effective learning exercises.
+AdvancedClozeEngine is a sophisticated cloze test generation system powered by BERT-based attention analysis. It creates intelligent gap-fill exercises by analyzing text using transformer attention patterns and advanced natural language processing techniques.
 
 ## Features
 
-- **Intelligent Masking**: Uses BERT attention patterns to identify important concepts
-- **Multi-difficulty Levels**: Supports easy, medium, and hard difficulty settings
-- **Phrase Detection**: Identifies meaningful phrases beyond single tokens
-- **Attention Visualization**: Provides insights into model decision-making
-- **Adaptive Difficulty**: Adjusts based on user feedback
-- **Domain Customization**: Supports domain-specific vocabulary emphasis
+- **Intelligent Gap Selection**: Uses BERT attention patterns to identify the most meaningful words and phrases to mask
+- **Multi-level Difficulty**: Supports easy, medium, and hard difficulty levels with configurable parameters
+- **Phrase Detection**: Advanced phrase detection for creating more challenging and contextually relevant cloze tests
+- **Attention Visualization**: Provides detailed visualization of attention patterns and head contributions
+- **Domain Adaptation**: Supports domain-specific token boosting for specialized content
+- **Smart Hint Generation**: Generates structured hints based on attention patterns and linguistic features
 
 ## Installation
 
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/AdvancedClozeEngine.git
+cd AdvancedClozeEngine
+```
+
+2. Create and activate a virtual environment:
+```bash
+python -m venv myenv
+source myenv/bin/activate  # On Windows, use: myenv\Scripts\activate
+```
+
+3. Install dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-## Quick Start
+4. Download the required spaCy model:
+```bash
+python -m spacy download en_core_web_sm
+```
+
+## Usage
+
+### Basic Usage
 
 ```python
-from attention_flash import create_engine
+from AdvancedClozeEngine import AdvancedClozeEngine
 
 # Initialize the engine
-engine = create_engine()
+engine = AdvancedClozeEngine()
 
-# Generate a cloze exercise
-result = engine.generate_cloze(
-    text="The transformer architecture revolutionized natural language processing.",
-    difficulty="medium"
-)
+# Generate a cloze test
+text = "The quick brown fox jumps over the lazy dog."
+result = engine.generate_cloze(text, difficulty="medium")
 
-print(f"Question: {result['masked']}")
-print(f"Answer: {result['answers'][0]['text']}")
+# Access the results
+print("Masked text:", result["masked"])
+print("Answers:", result["answers"])
 ```
 
-## API Reference
+### Difficulty Levels
 
-### AdvancedClozeEngine
+The engine supports three difficulty levels:
 
-The core class that handles cloze generation and attention analysis.
-
-#### Constructor
+- **Easy**: Single word masking with high confidence threshold
+- **Medium**: Multiple words and basic phrase masking
+- **Hard**: Complex phrase masking with overlapping allowed
 
 ```python
-AdvancedClozeEngine(model_name: str = "bert-base-uncased", domain_tokens: Optional[List[str]] = None)
+# Generate cloze tests with different difficulty levels
+easy_cloze = engine.generate_cloze(text, difficulty="easy")
+medium_cloze = engine.generate_cloze(text, difficulty="medium")
+hard_cloze = engine.generate_cloze(text, difficulty="hard")
 ```
 
-- `model_name`: The BERT model to use (default: "bert-base-uncased")
-- `domain_tokens`: Optional list of domain-specific tokens to emphasize
+### Advanced Features
 
-#### Methods
-
-##### generate_cloze
+#### Domain Adaptation
 
 ```python
-generate_cloze(text: str, strategy: str = "cross_sep", difficulty: str = "medium") -> Dict
+# Initialize with domain-specific tokens
+domain_tokens = ["python", "programming", "code"]
+engine = AdvancedClozeEngine(domain_tokens=domain_tokens)
 ```
 
-Generates a cloze exercise from the input text.
-
-- `text`: Input text to create exercise from
-- `strategy`: Attention analysis strategy (default: "cross_sep")
-- `difficulty`: Exercise difficulty level ("easy", "medium", "hard")
-
-Returns a dictionary containing:
-- `original`: Original input text
-- `masked`: Text with masked tokens
-- `answers`: List of correct answers and their positions
-- `visualization`: Attention visualization data
-
-##### analyze_attention
+#### Attention Analysis
 
 ```python
-analyze_attention(text: str) -> Tuple[torch.Tensor, List[str], torch.Tensor]
+# Get detailed attention analysis
+attention, tokens, hidden_states = engine.analyze_attention(text)
+
+# Get head contributions for specific tokens
+head_info = engine._get_head_contributions(attention, token_idx=1)
 ```
 
-Analyzes attention patterns in the input text.
+## Configuration
 
-- `text`: Input text to analyze
+The engine provides various configuration options:
 
-Returns:
-- Attention tensor
-- List of tokens
-- Hidden states
+```python
+# Customize phrase detection parameters
+engine.phrase_config = {
+    "min_phrase_len": 2,
+    "max_phrase_len": 4,
+    "phrase_threshold": 0.7
+}
 
-## Difficulty Levels
+# Adjust difficulty settings
+engine.difficulty_config["medium"] = {
+    "num_masks": 2,
+    "threshold_percentile": 85,
+    "allow_phrases": True,
+    "allow_overlap": False
+}
+```
 
-### Easy
-- Single token masking
-- High confidence selections (95th percentile)
-- No phrase masking
-- No overlapping masks
+## Contributing
 
-### Medium
-- Two token masking
-- Moderate confidence selections (85th percentile)
-- Allows phrase masking
-- No overlapping masks
-
-### Hard
-- Three token masking
-- Lower confidence threshold (75th percentile)
-- Allows phrase masking
-- Allows overlapping masks
-
-## Technical Details
-
-### Attention Analysis
-
-The system analyzes attention patterns across all layers and heads of the BERT model to identify important tokens and phrases. Key components include:
-
-1. **Token Importance Scoring**: Combines attention weights across layers and heads
-2. **Phrase Detection**: Identifies meaningful multi-token sequences
-3. **Head Contribution Analysis**: Tracks which attention heads contribute most to token selection
-
-### Hint Generation
-
-The system generates structured hints based on:
-
-- Attention patterns
-- Domain relevance
-- Cross-sentence relationships
-- Head contribution analysis
-
-Hints include confidence levels and specific attention head information.
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-MIT License
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Requirements
+## Acknowledgments
 
-- Python 3.7+
-- PyTorch 2.0+
-- Transformers 4.30+
-- BertViz 1.4+
-- Additional dependencies in requirements.txt
+- Built on Hugging Face's Transformers library
+- Uses BERT-based attention analysis
+- Incorporates spaCy for linguistic analysis
