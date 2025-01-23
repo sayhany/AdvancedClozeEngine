@@ -10,6 +10,7 @@ AdvancedClozeEngine is a sophisticated cloze test generation system powered by B
 - **Attention Visualization**: Provides detailed visualization of attention patterns and head contributions
 - **Domain Adaptation**: Supports domain-specific token boosting for specialized content
 - **Smart Hint Generation**: Generates structured hints based on attention patterns and linguistic features
+- **Interactive Web Interface**: Built-in Streamlit UI for easy interaction and visualization
 
 ## Installation
 
@@ -123,3 +124,11 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Built on Hugging Face's Transformers library
 - Uses BERT-based attention analysis
 - Incorporates spaCy for linguistic analysis
+
+## Running the Web Interface
+
+Start the Streamlit interface:
+```bash
+cd AdvancedClozeEngine
+streamlit run AdvancedClozeEngine/app.py
+```
