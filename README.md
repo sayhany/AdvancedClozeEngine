@@ -249,3 +249,53 @@ The app will be available at a public URL that you can share with others. Stream
 - App goes to sleep after inactivity
 
 For production use or larger workloads, consider upgrading to a paid tier or hosting on your own infrastructure.
+
+### Cleaning Git History
+
+If you accidentally committed files that should have been ignored (like `__pycache__`, `.DS_Store`, etc.), you can clean them from your repository's history using BFG Repo-Cleaner:
+
+1. **Backup Your Repository**
+   ```bash
+   # Create a backup of your local repository
+   cp -r your-repository your-repository-backup
+   ```
+
+2. **Install BFG**
+   ```bash
+   # On macOS (using Homebrew)
+   brew install bfg
+
+   # On other systems, download the JAR file
+   # from https://rtyley.github.io/bfg-repo-cleaner/
+   ```
+
+3. **Clean the Repository**
+   ```bash
+   # Remove all .pyc files
+   bfg --delete-files "*.pyc" your-repository
+
+   # Remove __pycache__ directories
+   bfg --delete-folders "__pycache__" your-repository
+
+   # Remove .DS_Store files
+   bfg --delete-files ".DS_Store" your-repository
+
+   # Remove the virtual environment directory
+   bfg --delete-folders "myenv" your-repository
+   ```
+
+4. **Clean Up and Push**
+   ```bash
+   cd your-repository
+   git reflog expire --expire=now --all && git gc --prune=now --aggressive
+   git push --force
+   ```
+
+**Note**: This will rewrite history, so:
+- All collaborators will need to re-clone the repository
+- Make sure to coordinate with your team before doing this
+- Only do this if the files contain no sensitive information (for sensitive data, consider professional help)
+
+For more complex cleaning tasks or if you need to remove sensitive data, consider using:
+- GitHub's documentation on removing sensitive data: https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/removing-sensitive-data-from-a-repository
+- Professional tools or services for repository cleaning

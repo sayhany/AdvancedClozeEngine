@@ -1,9 +1,22 @@
+# Project specific virtual environment
+/myenv/
+
 # Python
-__pycache__/
-*.py[cod]
-*$py.class
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
 *.so
+
+# Python package files
+**/*.pyc
+**/*.pyo
+**/*.pyd
 .Python
+**/__init__.pyc
+**/.pytest_cache/
+**/.coverage
+.python-version
 build/
 develop-eggs/
 dist/
@@ -21,7 +34,6 @@ wheels/
 *.egg
 
 # Virtual Environment
-myenv/
 venv/
 ENV/
 env/
@@ -39,10 +51,34 @@ env/
 .ipynb_checkpoints
 *.ipynb
 
-# System
+# macOS system files
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows system files
 Thumbs.db
-*.log
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Git
+.git/
+.gitattributes
 
 # Project specific
 *.pt
@@ -53,8 +89,12 @@ Thumbs.db
 
 # Streamlit
 .streamlit/
+.streamlit/config.toml
+.streamlit/secrets.toml
 
-# Cache
+# Cache and logs
 __pycache__/
 .cache/
 .pytest_cache/
+*.log
+logs/
