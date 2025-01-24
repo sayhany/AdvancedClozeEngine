@@ -125,10 +125,127 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Uses BERT-based attention analysis
 - Incorporates spaCy for linguistic analysis
 
-## Running the Web Interface
+## Using the Streamlit Interface
 
-Start the Streamlit interface:
+The AdvancedClozeEngine comes with a user-friendly web interface built with Streamlit, making it easy to generate and visualize cloze tests without writing any code.
+
+### Quick Start with Streamlit
+
+1. Make sure you've completed the installation steps above
+2. Navigate to the project directory:
 ```bash
 cd AdvancedClozeEngine
+```
+
+3. Activate the virtual environment:
+```bash
+# On macOS/Linux:
+source myenv/bin/activate
+
+# On Windows:
+myenv\Scripts\activate
+```
+
+4. Launch the Streamlit app:
+```bash
 streamlit run AdvancedClozeEngine/app.py
 ```
+
+The app will open in your default web browser at `http://localhost:8501`.
+
+### Using the Interface
+
+1. **Enter Text**: Type or paste your text in the input area. You can also use the example texts provided.
+
+2. **Configure Settings**:
+   - **Difficulty**: Choose between Easy, Medium, or Hard
+   - **Strategy**: Select the masking strategy
+   - **Max Masks**: Adjust the maximum number of words/phrases to mask
+
+3. **Domain Settings** (Optional):
+   - Click "Domain Settings" to expand
+   - Enter domain-specific terms (one per line) to boost their masking probability
+
+4. **Generate and Review**:
+   - Click "Generate Cloze" to create the test
+   - Review the masked text and answers
+   - Analyze attention patterns in the visualization
+   - Provide feedback to improve future generations
+
+### Features of the Web Interface
+
+- **Interactive Visualization**: View attention patterns and head contributions
+- **Instant Feedback**: Rate the difficulty as "Too Easy", "Perfect", or "Too Hard"
+- **Export Options**: Download results as JSON or generate new versions
+- **Domain Customization**: Add domain-specific terms for better masking
+- **Multiple Example Texts**: Try different domains (General, Medical, Technical)
+
+### Troubleshooting
+
+If you encounter any issues:
+
+1. **ModuleNotFoundError**:
+   - Ensure you're in the virtual environment
+   - Try reinstalling requirements: `pip install -r requirements.txt`
+
+2. **CUDA/GPU Issues**:
+   - The engine automatically falls back to CPU if CUDA is unavailable
+   - No additional configuration needed
+
+3. **Memory Issues**:
+   - Try shorter text segments
+   - Reduce the maximum number of masks
+
+4. **Visualization Problems**:
+   - Make sure you have a modern web browser
+   - Clear browser cache if visualizations don't load
+
+### Tips for Best Results
+
+1. **Text Length**: 
+   - Optimal results with 1-3 sentences
+   - Longer texts may take more processing time
+
+2. **Difficulty Selection**:
+   - Start with "Medium" difficulty
+   - Use feedback to adjust difficulty level
+
+3. **Domain Adaptation**:
+   - Add relevant technical terms for specialized texts
+   - Use 3-5 domain terms for best results
+
+4. **Visualization**:
+   - Use the layer filtering to focus on specific attention patterns
+   - Compare different masks' attention patterns
+
+For more advanced usage and API documentation, see the sections below.
+
+### Deploying to Streamlit Cloud
+
+You can easily deploy the app to Streamlit Cloud to share it with others:
+
+1. **Fork the Repository**:
+   - Fork this repository to your GitHub account
+   - Make sure your fork is public
+
+2. **Sign up for Streamlit Cloud**:
+   - Go to [share.streamlit.io](https://share.streamlit.io)
+   - Sign in with your GitHub account
+
+3. **Deploy the App**:
+   - Click "New app"
+   - Select your forked repository
+   - Set the main file path to: `AdvancedClozeEngine/app.py`
+   - Click "Deploy"
+
+The app will be available at a public URL that you can share with others. Streamlit Cloud will automatically:
+- Install all dependencies from requirements.txt
+- Set up the Python environment
+- Handle HTTPS and scaling
+
+**Note**: The free tier of Streamlit Cloud has some limitations:
+- Memory usage is limited
+- Compute resources are shared
+- App goes to sleep after inactivity
+
+For production use or larger workloads, consider upgrading to a paid tier or hosting on your own infrastructure.
